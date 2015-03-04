@@ -1,0 +1,2 @@
+serviceClass: com.SpeechyPC.client.SpeechService
+path: 6747E029A95061D4455D376E3C6BB823.gwt.rpc
