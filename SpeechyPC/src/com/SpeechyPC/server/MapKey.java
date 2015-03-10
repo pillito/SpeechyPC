@@ -6,5 +6,6 @@ public enum MapKey {
 	MappaLogin,
 	MappaFollower,
 	MappaMessaggio,
-	MappaCategoria
+	MappaCategoria,
+	MappaAdmin
 }

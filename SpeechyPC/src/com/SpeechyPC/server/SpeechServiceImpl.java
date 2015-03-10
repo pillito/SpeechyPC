@@ -13,6 +13,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import com.SpeechyPC.client.SpeechService;
+import com.SpeechyPC.shared.Strutture.Categoria;
 import com.SpeechyPC.shared.Strutture.Utente;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -45,7 +46,7 @@ public class SpeechServiceImpl extends RemoteServiceServlet implements
 			mapUtenti.put(chiaveMapLogin, nuovoUtente);
 			db.commit();
 			db.close();
-			creaSessione(idI);
+			creaSessione(usernameI);
 			System.out.println("Registrazione - Utente : " + nuovoUtente.toString()); // controllo dei dati
 			return true; // registrazione inserita
 		} else{
@@ -61,12 +62,38 @@ public class SpeechServiceImpl extends RemoteServiceServlet implements
 		HttpServletRequest request = this.getThreadLocalRequest();
 		//non creare una nuova -> false
 		HttpSession session = request.getSession(false);
-		if (session == null || session.getAttribute("idUtente") == null){
-			return null;
+		if (session == null || session.getAttribute("usernameUtente") == null){
+			return "";
 		}
 		// sessione e idUtente disponibili, l'utente sembra loggato correttamente.
-		return session.getAttribute("idUtente").toString();
+		System.out.print(session.getAttribute("usernameUtente").toString());
+		return session.getAttribute("usernameUtente").toString();
 	}
+	
+	//LoginADMIN
+	public boolean loginAdmin(String username, String password) {
+		username = escapeHtml(username);
+		password = escapeHtml(password);
+		Tuple2<String, String> chiaveMapLogin = new Tuple2<String, String>(username, password);
+		
+		DB db = DBMaker.newFileDB(new File("SpeechPCDB")).closeOnJvmShutdown().make();
+		ConcurrentNavigableMap<Fun.Tuple2<String, String>, Utente> mapUtenti = db.getTreeMap(MapKey.MappaUtenti.toString());
+		if(!mapUtenti.isEmpty()){
+			
+			for(Tuple2<String, String> tupla: mapUtenti.keySet()){
+				if(tupla.equals(chiaveMapLogin) && (mapUtenti.get(tupla)).getNomeUtente().equals("admin")){
+					db.close();
+					creaSessione(username);
+					return true;
+				}
+			}
+		} else {
+			db.close();
+			return false;
+		}
+		return false;
+	}
+	
 	
 	@Override
 	public boolean login(String username, String password) {
@@ -78,7 +105,7 @@ public class SpeechServiceImpl extends RemoteServiceServlet implements
 		ConcurrentNavigableMap<Fun.Tuple2<String, String>, Utente> mapUtenti = db.getTreeMap(MapKey.MappaUtenti.toString());
 		if(!mapUtenti.isEmpty()){
 			String idEstratto = "";
-			// controllo se la chiave è presente nella mapLogin, ed estraggo l'id a cui è associato.
+			// controllo se la chiave ï¿½ presente nella mapLogin, ed estraggo l'id a cui ï¿½ associato.
 			for(Tuple2<String, String> tupla: mapUtenti.keySet()){
 				if(tupla.equals(chiaveMapLogin)){
 					Utente utenteEstratto = mapUtenti.get(tupla);
@@ -112,7 +139,7 @@ public class SpeechServiceImpl extends RemoteServiceServlet implements
 	}
 	
 	/*
-	 * Controlla che la sessione esista già per l'utente, se si ritorna l'oggetto sessione, 
+	 * Controlla che la sessione esista giï¿½ per l'utente, se si ritorna l'oggetto sessione, 
 	 * altrimenti crea una nuova sessione (true) e ritorna  il nuovo oggetto sessione.
 	 * return --> l'id dell'utente appena loggato.
 	 */
@@ -137,5 +164,26 @@ public class SpeechServiceImpl extends RemoteServiceServlet implements
 		}
 		return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
 				.replaceAll(">", "&gt;");
+	}
+
+	@Override
+	public boolean categoria(Categoria categoria) {
+		// TODO Auto-generated method stub
+		String nomeCategoriaI = escapeHtml(categoria.getNomeCategoria());
+		
+		DB db = DBMaker.newFileDB(new File("SpeechPCDB")).closeOnJvmShutdown().make();
+		ConcurrentNavigableMap<String, Categoria> mapCategoria = db.getTreeMap(MapKey.MappaCategoria.toString());
+		if(mapCategoria.isEmpty() || !mapCategoria.values().contains(nomeCategoriaI)){
+			Categoria nuovaCategoria = new Categoria(nomeCategoriaI);
+			String idC = Integer.toString(mapCategoria.keySet().size());
+			mapCategoria.put(idC, categoria);
+			db.commit();
+			db.close();
+			System.out.println("Creazione - Categoria : " + nuovaCategoria.toString()); // controllo dei dati
+			return true; // Categoria inserita
+		} else{
+			db.close();
+		return false;
+		}
 	}
 }

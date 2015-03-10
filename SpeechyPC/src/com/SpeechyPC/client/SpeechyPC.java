@@ -4,11 +4,13 @@ import com.SpeechyPC.client.GUI.GUI_Principale;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootPanel;
 
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class SpeechyPC implements EntryPoint {
 	
+
 	private static SpeechyPC instance;
 	private RootPanel rootPanel;
 	private GUI_Principale gui_Principale;
@@ -35,5 +37,6 @@ public class SpeechyPC implements EntryPoint {
 	public GUI_Principale getstartRU() {
 		return gui_Principale;
 	}
+	
 }
 

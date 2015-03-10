@@ -1,5 +1,6 @@
 package com.SpeechyPC.client;
 
+import com.SpeechyPC.shared.Strutture.Categoria;
 import com.SpeechyPC.shared.Strutture.Utente;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,7 +40,7 @@ public class SpeechySingleton {
 			 public void onFailure(Throwable caught) {
 				// Show the RPC error message to the user
 			PopupPanel popup = new PopupPanel(true);
-				popup.setWidget(new HTML("<font color='red'>Impossibile inserire una nuova registrazione: Errore nella connessione con il server. Per favore riprovare più tardi</font>"));
+				popup.setWidget(new HTML("<font color='red'>Impossibile inserire una nuova registrazione: Errore nella connessione con il server. Per favore riprovare piï¿½ tardi</font>"));
 				popup.center();
 			 }
 			@Override
@@ -71,13 +72,41 @@ public class SpeechySingleton {
 			public void onSuccess(String result) {
 				if(result == null){
 					PopupPanel popup = new PopupPanel(true);
-					popup.setWidget(new HTML("<font color='red'>L'utente non è loggato</font>"));
+					popup.setWidget(new HTML("<font color='red'>L'utente non ï¿½ loggato</font>"));
 					popup.center();
 				} else {
 					// ottengo l' ID dell'utente
 				}
 			}
 			
+			
+		});
+	}
+	
+	public void loginAdmin(String username,String password){
+		getSpeechService().loginAdmin(username, password, new AsyncCallback<Boolean>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				PopupPanel popup = new PopupPanel(true);
+				popup.setWidget(new HTML("<font color='red'>Impossibile effetuare il login: Errore nella connessione con il server</font>"));
+				popup.center();
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				// TODO Auto-generated method stub
+				if(result == false){
+					PopupPanel popup = new PopupPanel(true);
+					popup.setWidget(new HTML("Login non riuscito, l' utente non e' registrato"));
+					popup.center();
+				 } else {
+					 PopupPanel popup = new PopupPanel(true);
+					 popup.setWidget(new HTML("<font color='green'size='5'>Benvenuto in Speechy Service!</font>"));
+					 popup.center();
+				 }
+			}
 			
 		});
 	}
@@ -127,6 +156,31 @@ public class SpeechySingleton {
 				}
 			}	
 		});
+	}
+	
+	
+	public void nuovaCategoria(Categoria categoria){
+		getSpeechService().categoria(categoria, new AsyncCallback<Boolean>() {
+			@Override
+			 public void onFailure(Throwable caught) {
+				// Show the RPC error message to the user
+			PopupPanel popup = new PopupPanel(true);
+				popup.setWidget(new HTML("<font color='red'>Impossibile inserire una nuova categoria: Errore nella connessione con il server. Per favore riprovare piï¿½ tardi</font>"));
+				popup.center();
+			 }
+			@Override
+			public void onSuccess(Boolean result) {
+				if(result == false){
+					PopupPanel popup = new PopupPanel(true);
+					popup.setWidget(new HTML("Inserzione categoria non riuscita, cambiare nome"));
+					popup.center();
+				 } else {
+					 PopupPanel popup = new PopupPanel(true);
+					 popup.setWidget(new HTML("<font color='green'size='5'>Benvenuto in Speechy Service!</font>"));
+					 popup.center();
+				 }	
+			}
+	     });
 	}
 	
 	

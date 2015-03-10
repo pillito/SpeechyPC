@@ -1,8 +1,13 @@
 package com.SpeechyPC.client.GUI;
 
+import com.SpeechyPC.client.SpeechService;
+import com.SpeechyPC.client.SpeechServiceAsync;
 import com.SpeechyPC.client.SpeechySingleton;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -15,6 +20,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 
 public class GUI_Principale extends Composite implements ClickHandler {
 
@@ -23,6 +29,7 @@ public class GUI_Principale extends Composite implements ClickHandler {
 	private ListBox categorieComboBox, speechersComboBox;
 	private Button btnRegistrati, btnLogin, btnLogout;
 	private Button btnCommenta;
+	private final SpeechServiceAsync speechService = GWT.create(SpeechService.class);
 	
 	public GUI_Principale() {
 		AbsolutePanel absolutePanel = new AbsolutePanel();
@@ -55,11 +62,10 @@ public class GUI_Principale extends Composite implements ClickHandler {
 		btnLogin.addClickHandler(this);
 		grid.setWidget(0, 5, btnLogin);
 		
-		
-
 		btnLogout = new Button("Logout");
 		btnLogout.addClickHandler(this);
 		grid.setWidget(0, 6, btnLogout);
+		
 		
 		grid.getCellFormatter().setHorizontalAlignment(0, 4, HasHorizontalAlignment.ALIGN_RIGHT);
 		grid.getCellFormatter().setVerticalAlignment(0, 4, HasVerticalAlignment.ALIGN_TOP);
@@ -99,7 +105,6 @@ public class GUI_Principale extends Composite implements ClickHandler {
 	
 	@Override
 	public void onClick(ClickEvent event) {
-		
 		Button control = (Button)event.getSource();
 		if(control == btnRegistrati){
 			dialogRegistra = new DialogBox();
@@ -127,7 +132,7 @@ public class GUI_Principale extends Composite implements ClickHandler {
 			final Button close = new Button("Chiudi");
 			close.setSize("70px", "25px");
 			VerticalPanel dialogVPanel = new VerticalPanel();
-			dialogVPanel.add(new GUI_Login()); // richiamo il pannello che gestisce la registrazione.
+			dialogVPanel.add(new GUI_Login()); // richiamo il pannello che gestisce il Login.
 			dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
 			dialogVPanel.add(close);
 			dialogRegistra.setWidget(dialogVPanel);
@@ -135,12 +140,41 @@ public class GUI_Principale extends Composite implements ClickHandler {
 			close.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					dialogRegistra.hide();
+					//Verifica loginAdmin
+					speechService.verificaLogin(new AsyncCallback<String>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void onSuccess(String result) {
+							// TODO Auto-generated method stub
+							if (result.equals("admin")){
+								Window.alert("I dati inseriti non sono corretti.");
+								return;
+							}
+							RootPanel.get("container").clear();
+							RootPanel.get("container").add(new GUI_Admin());
+						}
+						
+					});
+					
+					
+					
 				}
 			});
 		}
+		
 		if(control == btnLogout){
 			SpeechySingleton.getSingletonIstance().logout();
 		}
+		
+		
+		
+		
 	//	if(control == pshbtnNewButton ){
 	//	}
 	}

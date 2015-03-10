@@ -1,5 +1,6 @@
 package com.SpeechyPC.client;
 
+import com.SpeechyPC.shared.Strutture.Categoria;
 import com.SpeechyPC.shared.Strutture.Utente;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -16,7 +17,10 @@ public interface SpeechService extends RemoteService {
 	
 	boolean logout();
 	
-	String verificaLogin();
+	boolean loginAdmin(String username, String password);
 	
+	boolean categoria (Categoria categoria);
+	
+	String verificaLogin();
 	
 }
